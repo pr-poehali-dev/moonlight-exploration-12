@@ -1,0 +1,24 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Submit access request",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "request", "email": "test@example.com"},
+      "expectedStatus": 200
+    },
+    {
+      "name": "Invalid email",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "request", "email": "notanemail"},
+      "expectedStatus": 400
+    }
+  ]
+}

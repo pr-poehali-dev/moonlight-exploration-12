@@ -1,0 +1,24 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Chat demo mode",
+      "method": "POST",
+      "path": "/",
+      "body": {"message": "Привет, КИРА!", "history": []},
+      "expectedStatus": 200
+    },
+    {
+      "name": "Empty message error",
+      "method": "POST",
+      "path": "/",
+      "body": {"message": ""},
+      "expectedStatus": 400
+    }
+  ]
+}
