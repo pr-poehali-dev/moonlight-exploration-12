@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
+import { useKiraHistory } from "@/hooks/useKiraHistory";
 
 const CHAT_URL = "https://functions.poehali.dev/c6d2bb21-3063-4993-b1b5-b5c284a5e0ca";
 
@@ -24,6 +25,7 @@ export function KiraChat() {
   const [speaking, setSpeaking] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const { saveMessage } = useKiraHistory();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -60,6 +62,7 @@ export function KiraChat() {
 
     const userMsg: Message = { role: "user", text };
     setMessages((prev) => [...prev, userMsg]);
+    saveMessage(sessionId, { role: "user", text });
     setLoading(true);
 
     const history = messages.slice(-10).map((m) => ({
@@ -85,6 +88,7 @@ export function KiraChat() {
         taskType: parsed.task_type,
       };
       setMessages((prev) => [...prev, kiraMsg]);
+      saveMessage(sessionId, { role: "kira", text: responseText, taskType: parsed.task_type });
       setTimeout(() => speak(responseText), 200);
     } catch {
       const errMsg: Message = {
@@ -159,12 +163,17 @@ export function KiraChat() {
                   КИРА {speaking ? "— говорит..." : loading ? "— думает..." : "— онлайн"}
                 </span>
               </div>
-              <button
-                onClick={() => speaking && window.speechSynthesis.cancel()}
-                className="font-mono text-[10px] uppercase text-foreground/30 hover:text-foreground/60 transition-colors"
-              >
-                {speaking ? "[ стоп ]" : ""}
-              </button>
+              <div className="flex items-center gap-3">
+                {speaking && (
+                  <button onClick={() => window.speechSynthesis.cancel()} className="font-mono text-[10px] uppercase text-foreground/30 hover:text-foreground/60 transition-colors">
+                    [ стоп ]
+                  </button>
+                )}
+                <a href="/cabinet" className="font-mono text-[10px] uppercase text-primary/50 hover:text-primary transition-colors flex items-center gap-1">
+                  <Icon name="History" size={12} />
+                  история
+                </a>
+              </div>
             </div>
 
             {/* Messages */}
@@ -234,7 +243,10 @@ export function KiraChat() {
           </div>
 
           <p className="text-center font-mono text-xs text-foreground/30 mt-4">
-            Это демо-версия. Полный доступ — после регистрации.
+            Диалог сохраняется автоматически.{" "}
+            <a href="/cabinet" className="text-primary/50 hover:text-primary transition-colors underline underline-offset-2">
+              Открыть личный кабинет →
+            </a>
           </p>
         </div>
       </div>
